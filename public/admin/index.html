@@ -1,3 +1,11 @@
+<!-- 在最顶端使用接口获取登陆状态 -->
+<script src="/login/status"></script>
+<!-- 根据登陆状态决定是否拦截 -->
+<script type="text/javascript">
+  if (isLogin == false){
+    location.href = '/admin/login.html';
+  }
+</script>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
