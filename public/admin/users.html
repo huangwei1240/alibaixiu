@@ -154,7 +154,7 @@
       <td>{{$value.role==normal?'普通用户':'管理员'}}</td>
       <td class="text-center">
         <a href="javascript:;" class="btn btn-default btn-xs" id="edit" data-id="{{@$value._id}}">编辑</a>
-        <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
+        <a href="javascript:;" class="btn btn-danger btn-xs" id="delete" data-id="{{@$value._id}}">删除</a>
       </td>
     </tr>
     {{/each}}
@@ -295,7 +295,7 @@
         type:'put',
         data:result,
         success:function(data){
-          location.href = '/admin/users.html'
+          location.href = '/admin/users.html';
         }
       })
       // console.log(result)
@@ -303,7 +303,18 @@
       return false
     })
 
-
+    // 用户删除
+    $('#list').on('click','#delete',function(){
+      var id = $(this).attr('data-id')
+      $.ajax({
+        type:'delete',
+        url:'/users/'+id,
+        success:function(data){
+          location.href = '/admin/users.html';
+        }
+      })
+      // console.log(id)
+    })
   </script>
   <script src="/assets/js/exit.js"></script>
 </body>
