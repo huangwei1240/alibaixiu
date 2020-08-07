@@ -30,7 +30,7 @@
       </div> -->
       <div class="row">
         <div class="col-md-4">
-          <form id="addForm">
+          <form id="userForm">
             <h2>添加新用户</h2>
             <div class="form-group">
               <label>头像</label>
@@ -189,7 +189,7 @@
     </div>
     <div class="form-group">
       <label>密码</label>
-      <input name="password" class="form-control" type="password" placeholder="请输入密码" value="{{password}}">
+      <input name="password" class="form-control" type="password" placeholder="请输入密码" id="password">
     </div>
     <div class="form-group">
       <div class="radio-inline">
@@ -208,7 +208,7 @@
       </div>
     </div>
     <div class="form-group">
-      <button class="btn btn-primary" type="submit" id="editBtn">修改</button>
+      <button class="btn btn-primary" type="submit" id="editBtn" data-id="{{@_id}}">修改</button>
     </div>
   </script>
   <script type="text/javascript">
@@ -248,7 +248,7 @@
     // 新添用户功能
     $('#addBtn').on('click',function(){
       // 获取表单信息
-      var result = $('#addForm').serialize();
+      var result = $('#userForm').serialize();
       // console.log(result);
       $.ajax({
         url:'/users',
@@ -272,7 +272,7 @@
         type:'get',
         success:function(data){
           var result = template('user-edit',data);
-          $('#addForm').html(result);
+          $('#userForm').html(result);
           // console.log(result)
           // console.log(data);
         }
@@ -280,6 +280,28 @@
       // console.log(1)
     })
 
+    // 用户修改
+    $('#userForm').on('click','#editBtn',function(){
+      // 提醒需要输入密码
+      if($('#password').val().trim().length ==0){
+        alert('请填写密码');
+        return false
+      }
+      var id = $(this).attr('data-id')
+      // console.log(id)
+      var result = $('#userForm').serialize();
+      $.ajax({
+        url:'/users/'+id,
+        type:'put',
+        data:result,
+        success:function(data){
+          location.href = '/admin/users.html'
+        }
+      })
+      // console.log(result)
+      // 阻止表单的默认提交
+      return false
+    })
   </script>
   <script src="/assets/js/exit.js"></script>
 </body>
