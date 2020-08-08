@@ -255,12 +255,12 @@
         type:'post',
         data:result,
         success:function(data){
-          console.log(data)
-          // location.href = '/admin/users.html'
+          // console.log(data)
+          location.reload()
         },
         error:function(err){
           // console.log(err)
-          JSON.parse(err.responseText);
+          // JSON.parse(err.responseText);
           alert(JSON.parse(err.responseText).message)
         }
       })
