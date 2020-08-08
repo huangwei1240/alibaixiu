@@ -255,8 +255,8 @@
         type:'post',
         data:result,
         success:function(data){
-          console.log(data)
-          // location.href = '/admin/users.html'
+          // console.log(data)
+          location.reload()
         },
         error:function(err){
           // console.log(err)
@@ -300,7 +300,7 @@
         type:'put',
         data:result,
         success:function(data){
-          location.href = '/admin/users.html';
+          location.reload();
         }
       })
       // console.log(result)
@@ -315,7 +315,7 @@
         type:'delete',
         url:'/users/'+id,
         success:function(data){
-          location.href = '/admin/users.html';
+          location.reload();
         }
       })
       // console.log(id)
