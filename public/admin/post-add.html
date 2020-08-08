@@ -28,15 +28,15 @@
       <!-- <div class="alert alert-danger">
         <strong>错误！</strong>发生XXX错误
       </div> -->
-      <form class="row">
+      <form class="row" id="postForm">
         <div class="col-md-9">
           <div class="form-group">
             <label for="title">标题</label>
-            <input id="title" class="form-control input-lg" type="text" placeholder="文章标题">
+            <input id="title" class="form-control input-lg" type="text" placeholder="文章标题" name="title">
           </div>
           <div class="form-group">
             <label for="content">内容</label>
-            <textarea id="content" class="form-control input-lg" cols="30" rows="10" placeholder="内容"></textarea>
+            <textarea id="content" class="form-control input-lg" cols="30" rows="10" placeholder="内容" name="content"></textarea>
           </div>
         </div>
         <div class="col-md-3">
@@ -45,27 +45,27 @@
             show when image chose
             <img class="help-block thumbnail" style="display: none" id="featureImg">
             <input id="feature" class="form-control" type="file">
-            <input type="hidden" id="featureContent">
+            <input type="hidden" name="thumbnail" id="featureContent">
           </div>
           <div class="form-group">
             <label for="category">所属分类</label>
-            <select id="category" class="form-control">
-              
+            <select id="category" class="form-control" name="category">
+              <!-- 分类选项模板 -->
             </select>
           </div>
           <div class="form-group">
             <label for="created">发布时间</label>
-            <input id="created" class="form-control" type="datetime-local">
+            <input id="created" class="form-control" type="datetime-local" name="createAt">
           </div>
           <div class="form-group">
             <label for="status">状态</label>
-            <select id="status" class="form-control">
+            <select id="status" class="form-control" name="state">
               <option value="0">草稿</option>
               <option value="1">已发布</option>
             </select>
           </div>
           <div class="form-group">
-            <button class="btn btn-primary" type="submit">保存</button>
+            <button class="btn btn-primary" type="submit" id="btn">保存</button>
           </div>
         </div>
       </form>
@@ -117,7 +117,7 @@
   <!-- 分类选项模板 -->
   <script type="text/html" id="categoryOption">
     {{each data}}
-    <option value="{{$index}}">{{$value.title}}</option>
+    <option value="{{@$value._id}}">{{$value.title}}</option>
     {{/each}}
   </script>
 
@@ -152,6 +152,25 @@
           $('#featureContent').val(data[0].avatar)
         }
       })
+    })
+
+    // 创建文章
+    $('#btn').on('click',function(){
+      var result = $('#postForm').serialize();
+      console.log(result);
+      $.ajax({
+        type:'post',
+        url:'/posts',
+        data:result,
+        success:function(){
+          location.href='/admin/posts.html'
+        },
+        error:function(err){
+          // alert(JSON.parse(err.responseText).message)
+          console.log(err);
+        }
+      })
+      return false
     })
   </script>
 </body>
