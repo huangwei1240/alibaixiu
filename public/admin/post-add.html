@@ -42,15 +42,14 @@
         <div class="col-md-3">
           <div class="form-group">
             <label for="feature">文章封面</label>
-            <!-- show when image chose -->
+            show when image chose
             <img class="help-block thumbnail" style="display: none">
             <input id="feature" class="form-control" type="file">
           </div>
           <div class="form-group">
             <label for="category">所属分类</label>
             <select id="category" class="form-control">
-              <option value="1">未分类</option>
-              <option value="2">潮生活</option>
+              
             </select>
           </div>
           <div class="form-group">
@@ -112,5 +111,24 @@
   <script src="../assets/vendors/jquery/jquery.js"></script>
   <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
   <script>NProgress.done()</script>
+  <script src="../assets/vendors/art-template/template-web.js"></script>
+
+  <!-- 分类选项模板 -->
+  <script type="text/html" id="categoryOption">
+    {{each data}}
+    <option value="{{$index}}">{{$value.title}}</option>
+    {{/each}}
+  </script>
+
+  <script type="text/javascript">
+    $.ajax({
+      type:'get',
+      url:'/categories',
+      success:function(data){
+        var result = template('categoryOption',{data});
+        $('#category').html(result);
+      }
+    })
+  </script>
 </body>
 </html>
