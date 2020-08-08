@@ -79,12 +79,12 @@
         <div class="col-md-8">
           <div class="page-action">
             <!-- show when multiple checked -->
-            <a class="btn btn-danger btn-sm" href="javascript:;" style="display: none">批量删除</a>
+            <a class="btn btn-danger btn-sm" href="javascript:;" style="display: none" id="all-delete">批量删除</a>
           </div>
           <table class="table table-striped table-bordered table-hover">
             <thead>
                <tr>
-                <th class="text-center" width="40"><input type="checkbox"></th>
+                <th class="text-center" width="40"><input type="checkbox" id="all-checked"></th>
                 <th class="text-center" width="80">头像</th>
                 <th>邮箱</th>
                 <th>昵称</th>
@@ -146,7 +146,7 @@
   <script type="text/html" id="table-tr">
     {{each data}}
     <tr>
-      <td class="text-center"><input type="checkbox"></td>
+      <td class="text-center"><input type="checkbox" data-id="{{@$value._id}}"></td>
       <td class="text-center"><img class="avatar" src="../assets/img/default.png"></td>
       <td>{{$value.email}}</td>
       <td>{{$value.nickName}}</td>
@@ -255,8 +255,13 @@
         type:'post',
         data:result,
         success:function(data){
-          // console.log(data)
-          location.href = '/admin/users.html'
+          console.log(data)
+          // location.href = '/admin/users.html'
+        },
+        error:function(err){
+          // console.log(err)
+          JSON.parse(err.responseText);
+          alert(JSON.parse(err.responseText).message)
         }
       })
       // 取消form默认提交
@@ -314,6 +319,56 @@
         }
       })
       // console.log(id)
+    })
+
+    // 用户批量删除 全选按钮
+    $('#all-checked').on('click',function(){
+      var childChecked = $('#list').find('input')
+      // 判断全选按钮的选中状态 控制子元素按钮
+      if($(this).is(':checked')){
+        childChecked.prop('checked',true);
+        $('#all-delete').prop('style','display:lineblock');
+      }else{
+        childChecked.prop('checked',false);
+        $('#all-delete').prop('style','display:none');
+      }
+      // console.log($(this).is(':checked'))
+    })
+
+    // 户批量删除 子元素按钮
+    $('#list').on('click','input',function(){
+      var childChecked = $('#list').find('input')
+      // 判断有被选中的 显示批量删除按钮
+      if(childChecked.filter(':checked').length==0){
+        $('#all-delete').prop('style','display:none');
+      }else{
+        $('#all-delete').prop('style','display:lineblock');
+      };
+      // 判断全选择 全选按钮被选中
+      if(childChecked.filter(':checked').length == childChecked.length){
+        $('#all-checked').prop('checked',true);
+      }else{
+        $('#all-checked').prop('checked',false);
+      };
+      // console.log($('#list').find('input').filter(':checked').length)
+    })
+
+    // 批量删除功能
+    $('#all-delete').on('click',function(){
+      var arrId = [];
+      var inputChecked = $('#list').find('input').filter(':checked');
+      inputChecked.each(function(index,value,arr){
+        arrId[index] = $(value).attr('data-id');
+        // console.log($(value).attr('data-id'));
+      })
+      var farams = arrId.join('-')
+      $.ajax({
+        type:'delete',
+        url:'/users/'+farams,
+        success:function(){
+          location.reload()
+        }
+      })
     })
   </script>
   <script src="/assets/js/exit.js"></script>
