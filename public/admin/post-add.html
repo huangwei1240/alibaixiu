@@ -43,8 +43,9 @@
           <div class="form-group">
             <label for="feature">文章封面</label>
             show when image chose
-            <img class="help-block thumbnail" style="display: none">
+            <img class="help-block thumbnail" style="display: none" id="featureImg">
             <input id="feature" class="form-control" type="file">
+            <input type="hidden" id="featureContent">
           </div>
           <div class="form-group">
             <label for="category">所属分类</label>
@@ -121,6 +122,7 @@
   </script>
 
   <script type="text/javascript">
+    // 将分类列表数据获取 添加到分类下拉框
     $.ajax({
       type:'get',
       url:'/categories',
@@ -128,6 +130,28 @@
         var result = template('categoryOption',{data});
         $('#category').html(result);
       }
+    })
+
+    // 封面上传 
+    $('#feature').on('change',function(){
+      var file = this.files[0];
+      console.log(this.files[0])
+      var formData = new FormData();
+      formData.append('avatar',file);
+      $.ajax({
+        type:'post',
+        url:'/upload',
+        data:formData,
+        processData: false,
+        contentType: false,
+        success:function(data){
+          $('#featureImg').prop({
+            'src':data[0].avatar,
+            'style':'display:inline-block'
+          });
+          $('#featureContent').val(data[0].avatar)
+        }
+      })
     })
   </script>
 </body>
