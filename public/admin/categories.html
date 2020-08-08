@@ -46,19 +46,19 @@
           </form>
         </div>
         <div class="col-md-8">
-          <!-- <div class="page-action">
-            <a class="btn btn-danger btn-sm" href="javascript:;">批量删除</a>
-          </div> -->
+          <div class="page-action">
+            <a class="btn btn-danger btn-sm" href="javascript:;" style="display:none" id="manyDelete">批量删除</a>
+          </div>
           <table class="table table-striped table-bordered table-hover">
             <thead>
               <tr>
-                <th class="text-center" width="40"><input type="checkbox"></th>
+                <th class="text-center" width="40"><input type="checkbox" id="all-checked"></th>
                 <th>名称</th>
                 <th class="text-center" width="100">操作</th>
               </tr>
             </thead>
             <tbody id="categoriesTbody">
-              
+              <!-- 分类列表模板 -->
             </tbody>
           </table>
         </div>
@@ -110,7 +110,7 @@
   <script type="text/html" id="categoriesView">
     {{each data}}
     <tr>
-      <td class="text-center"><input type="checkbox"></td>
+      <td class="text-center"><input type="checkbox" id="childBtn" data-id="{{@$value._id}}"></td>
       <td>{{$value.title}}</td>
       <td class="text-center">
         <a href="javascript:;" data-id="{{@$value._id}}" id="editBtn" class="btn btn-info btn-xs">编辑</a>
@@ -207,6 +207,73 @@
       }) 
       return false
     })
+
+    // 删除功能
+    $('#categoriesTbody').on('click','#deleteBtn',function(){
+      var id = $(this).attr('data-id')
+      $.ajax({
+        type:'delete',
+        url:'/categories/'+id,
+        success:function(){
+          location.reload();
+        },
+        error:function(){
+          alert(JSON.parse(err.responseText).message)
+        }
+      })
+    })
+
+    // 全选删除按钮
+    $('#all-checked').on('click',function(){
+      var childBtn = $('#categoriesTbody').find('input')
+      if($(this).is(':checked')){
+        childBtn.prop('checked',true);
+        $('#manyDelete').prop('style','display:inline-block')
+      }else{
+        childBtn.prop('checked',false);
+        $('#manyDelete').prop('style','display:none')
+
+      }
+      // console.log($(this).is(':checked'))
+    })
+
+    // 子元素删除按钮
+    $('#categoriesTbody').on('click','#childBtn',function(){
+      var childBtn = $('#categoriesTbody').find('input')
+      var checkedNum = childBtn.filter(':checked').length
+      if(checkedNum != 0){
+        $('#manyDelete').prop('style','display:inline-block')
+      }else{
+        $('#manyDelete').prop('style','display:none')
+      }
+      if(checkedNum  == childBtn.length){
+        $('#all-checked').prop('checked',true);
+      }else{
+        $('#all-checked').prop('checked',false);
+      }
+    })
+
+    // 批量删除功能
+    $('#manyDelete').on('click',function(){
+      var checkedEle = $('#categoriesTbody').find('input').filter(':checked');
+      var idArr = [];
+      checkedEle.each(function(index,value){
+        // console.log(value)
+        idArr[index] = $(value).attr('data-id')
+      })
+      // console.log(idArr)  
+      var params = idArr.join('-')
+      $.ajax({
+        type:'delete',
+        url:'/categories/'+params,
+        success:function(){
+          location.reload();
+        },
+        eror:function(err){
+          alert(JSON.parse(err.responseText).message);
+        }
+      }) 
+    }) 
   </script>
 </body>
 </html>
