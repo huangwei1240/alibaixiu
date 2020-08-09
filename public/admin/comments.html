@@ -100,8 +100,8 @@
       <td>{{$imports.formateDate($value.createAt)}}</td>
       <td>{{$value.state==0?'未批准':'已批准'}}</td>
       <td class="text-center">
-        <a href="post-add.html" id="Btn" data-id="{{$value._id}}" class="btn btn-warning btn-xs">{{$value.state==0?'批准':'驳回'}}</a>
-        <a href="javascript:;" id="Btn" data-id="{{$value._id}}"class="btn btn-danger btn-xs">删除</a>
+        <a href="javascript:;" id="changeBtn" data-id="{{$value._id}}" class="btn {{$value.state==0?'btn-info':'btn-warning'}} btn-xs">{{$value.state==0?'批准':'驳回'}}</a>
+        <a href="javascript:;" id="deleteBtn" data-id="{{$value._id}}"class="btn btn-danger btn-xs">删除</a>
       </td>
     </tr>
     {{/each}}
@@ -138,18 +138,30 @@
       }
     })*/
 
-    //获取评论列表
-    $.ajax({
-      type:'GET',
-      url:'/comments',
-      success:function(data){
-        // 评论列表获取
-        var resultComment = template('commentTemplate',data)
-        $('#commentsBox').html(resultComment)
-        // 页码
-        var resultPage = template('pageTemplate',data)
-        $('#pageBox').html(resultPage)
+    // 获取评论列表
+    getComment()
+
+    $('#commentsBox').on('click','#changeBtn',function(){
+      var id = $(this).attr('data-id')
+      var stateNum 
+      if($(this).text() == '批准'){
+        stateNum = 1
+      }else{
+        stateNum = 0
       }
+      // console.log(id)
+      // console.log(stateNum)
+      $.ajax({
+        type:'put',
+        url:'/comments/'+id,
+        data:{
+          state:stateNum
+        },
+        success:function(data){
+          getComment()
+        }
+      })
+      // console.log(1)
     })
 
     // 封装页码变化的ajax函数
@@ -167,6 +179,22 @@
         // 评论页码
         var resultPage = template('pageTemplate',data)
         $('#pageBox').html(resultPage)
+        }
+      })
+    }
+
+     //获取评论列表
+    function getComment(){
+      $.ajax({
+        type:'GET',
+        url:'/comments',
+        success:function(data){
+          // 评论列表获取
+          var resultComment = template('commentTemplate',data)
+          $('#commentsBox').html(resultComment)
+          // 页码
+          var resultPage = template('pageTemplate',data)
+          $('#pageBox').html(resultPage)
         }
       })
     }
