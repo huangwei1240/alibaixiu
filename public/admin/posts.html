@@ -114,7 +114,7 @@
       <td class="text-center">{{$value.state==0?'草稿':'已发布'}}</td>
       <td class="text-center">
         <a href="javascript:;" data-id="{{@$value._id}}" id="edit" class="btn btn-default btn-xs">编辑</a>
-        <a href="javascript:;" data-id="{{@$value._id}}" id="" class="btn btn-danger btn-xs">删除</a>
+        <a href="javascript:;" data-id="{{@$value._id}}" id="delete" class="btn btn-danger btn-xs">删除</a>
       </td>
     </tr>
     {{/each}}
@@ -193,9 +193,21 @@
 
     // 编辑文章
     $('#postBox').on('click','#edit',function(){
-      var id = $(this).attr('data-id')
-      location.href = '/admin/post-add.html?id='+id
+      var id = $(this).attr('data-id');
+      location.href = '/admin/post-add.html?id='+id;
       // console.log(id)
+    })
+
+    // 删除文章
+    $('#postBox').on('click','#delete',function(){
+      var id = $(this).attr('data-id');
+      $.ajax({
+        type:'delete',
+        url:'/posts/'+id,
+        success:function(){
+          location.reload()
+        }
+      })
     })
 
     // 封装格式时间的函数
