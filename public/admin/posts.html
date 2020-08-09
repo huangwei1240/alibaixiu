@@ -144,22 +144,7 @@
 
   <script type="text/javascript">
     // 文章列表展示
-    $.ajax({
-      type:'get',
-      url:'/posts',
-      success:function(data){
-        
-        // 文章列表展示 
-        // console.log(data.records[0]._id)
-        var resultPost = template('postList',data);
-        $('#postBox').html(resultPost);
-        // console.log(result)
-
-        // 文章分页
-        var resultPage = template('page',data);
-        $('#pageBox').html(resultPage);
-      }
-    })
+    getPost()
 
     // 文章分类
     $.ajax({
@@ -206,7 +191,7 @@
         type:'delete',
         url:'/posts/'+id,
         success:function(){
-          location.reload()
+          getPost()
         }
       })
     })
@@ -227,6 +212,25 @@
         // 文章分页改变
         var resultPage = template('page',data);
         $('#pageBox').html(resultPage);
+        }
+      })
+    }
+
+    // 文章列表展示
+    function getPost(){
+      $.ajax({
+        type:'get',
+        url:'/posts',
+        success:function(data){
+          
+          // 文章列表展示 
+          var resultPost = template('postList',data);
+          $('#postBox').html(resultPost);
+          // console.log(result)
+
+          // 文章分页
+          var resultPage = template('page',data);
+          $('#pageBox').html(resultPage);
         }
       })
     }

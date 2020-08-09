@@ -137,16 +137,8 @@
   </script>
 
   <script type="text/javascript">
-    // 分类展示功能
-    $.ajax({
-      type:'get',
-      url:'/categories',
-      success:function(data){
-        var result = template('categoriesView',{data});
-        $('#categoriesTbody').html(result);
-        // console.log(result)
-      }
-    })
+    // 获取分类列表
+    getCategories()
     
     // 分类添加功能
     $('#addBtn').on('click',function(){
@@ -275,6 +267,19 @@
         }
       }) 
     }) 
+
+    // 分类展示功能
+    function getCategories(){
+      $.ajax({
+        type:'get',
+        url:'/categories',
+        success:function(data){
+          var result = template('categoriesView',{data});
+          $('#categoriesTbody').html(result);
+          // console.log(result)
+        }
+      })
+    }
   </script>
 </body>
 </html>
