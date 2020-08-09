@@ -93,7 +93,7 @@
   <!-- 评论模板 -->
   <script type="text/html" id="commentTemplate">
     {{each records}}
-    <tr>
+    <tr class={{$value.state==0?'danger':''}}>
       <td>{{$value.author.nickName}}</td>
       <td>{{$value.content}}</td>
       <td>{{$value.post.title}}</td>
@@ -121,13 +121,13 @@
   </script>
 
   <script type="text/javascript">
-    // 添加测试评论
-    /*$.ajax({
+    /*// 添加测试评论
+    $.ajax({
       type:'post',
       url:'/comments',
       data:{
         content:'楼主好人，顶一个',
-        post:'5f2efd127afe0f2f1c923da5',
+        post:'5f304ac6e1c11736fc834d0b',
         state:0
       },
       success:function(){
@@ -141,6 +141,7 @@
     // 获取评论列表
     getComment()
 
+    // 切换评论状态
     $('#commentsBox').on('click','#changeBtn',function(){
       var id = $(this).attr('data-id')
       var stateNum 
@@ -157,6 +158,19 @@
         data:{
           state:stateNum
         },
+        success:function(data){
+          getComment()
+        }
+      })
+      // console.log(1)
+    })
+
+    // 删除评论功能
+    $('#commentsBox').on('click','#deleteBtn',function(){
+      var id = $(this).attr('data-id')
+      $.ajax({
+        type:'delete',
+        url:'/comments/'+id,
         success:function(data){
           getComment()
         }
