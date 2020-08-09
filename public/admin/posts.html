@@ -113,8 +113,8 @@
       <td class="text-center">{{$imports.formateDate($value.createAt)}}</td>
       <td class="text-center">{{$value.state==0?'草稿':'已发布'}}</td>
       <td class="text-center">
-        <a href="javascript:;" class="btn btn-default btn-xs">编辑</a>
-        <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
+        <a href="javascript:;" data-id="{{@$value._id}}" id="edit" class="btn btn-default btn-xs">编辑</a>
+        <a href="javascript:;" data-id="{{@$value._id}}" id="" class="btn btn-danger btn-xs">删除</a>
       </td>
     </tr>
     {{/each}}
@@ -149,7 +149,7 @@
       success:function(data){
         
         // 文章列表展示 
-        // console.log(data.records[0].state)
+        // console.log(data.records[0]._id)
         var resultPost = template('postList',data);
         $('#postBox').html(resultPost);
         // console.log(result)
@@ -189,6 +189,13 @@
         }
       })
       return false
+    })
+
+    // 编辑文章
+    $('#postBox').on('click','#edit',function(){
+      var id = $(this).attr('data-id')
+      location.href = '/admin/post-add.html?id='+id
+      // console.log(id)
     })
 
     // 封装格式时间的函数
