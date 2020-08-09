@@ -22,50 +22,50 @@
     </nav>
     <div class="container-fluid">
       <div class="page-title">
-        <h1>写文章</h1>
+        <h1 id="titleChange">写文章</h1>
       </div>
       <!-- 有错误信息时展示 -->
       <!-- <div class="alert alert-danger">
         <strong>错误！</strong>发生XXX错误
       </div> -->
-      <form class="row">
+      <form class="row" id="postForm">
         <div class="col-md-9">
           <div class="form-group">
             <label for="title">标题</label>
-            <input id="title" class="form-control input-lg" type="text" placeholder="文章标题">
+            <input id="title" class="form-control input-lg" type="text" placeholder="文章标题" name="title">
           </div>
           <div class="form-group">
             <label for="content">内容</label>
-            <textarea id="content" class="form-control input-lg" cols="30" rows="10" placeholder="内容"></textarea>
+            <textarea id="content" class="form-control input-lg" cols="30" rows="10" placeholder="内容" name="content"></textarea>
           </div>
         </div>
         <div class="col-md-3">
           <div class="form-group">
             <label for="feature">文章封面</label>
-            <!-- show when image chose -->
-            <img class="help-block thumbnail" style="display: none">
+            show when image chose
+            <img class="help-block thumbnail" style="display: none" id="featureImg">
             <input id="feature" class="form-control" type="file">
+            <input type="hidden" name="thumbnail" id="featureContent">
           </div>
           <div class="form-group">
             <label for="category">所属分类</label>
-            <select id="category" class="form-control">
-              <option value="1">未分类</option>
-              <option value="2">潮生活</option>
+            <select id="category" class="form-control" name="category">
+              <!-- 分类选项模板 -->
             </select>
           </div>
           <div class="form-group">
             <label for="created">发布时间</label>
-            <input id="created" class="form-control" type="datetime-local">
+            <input id="created" class="form-control" type="datetime-local" name="createAt">
           </div>
           <div class="form-group">
             <label for="status">状态</label>
-            <select id="status" class="form-control">
-              <option value="0">草稿</option>
-              <option value="1">已发布</option>
+            <select id="status" class="form-control" name="state">
+              <option value="0" {{state==0?'selected':''}}>草稿</option>
+              <option value="1" {{state==1?'selected':''}}>已发布</option>
             </select>
           </div>
           <div class="form-group">
-            <button class="btn btn-primary" type="submit">保存</button>
+            <button class="btn btn-primary" type="submit" id="btn">保存</button>
           </div>
         </div>
       </form>
@@ -112,5 +112,162 @@
   <script src="../assets/vendors/jquery/jquery.js"></script>
   <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
   <script>NProgress.done()</script>
+  <script src="../assets/vendors/art-template/template-web.js"></script>
+
+  <!-- 分类选项模板 -->
+  <script type="text/html" id="categoryOption">
+    {{each data}}
+    <option value="{{@$value._id}}">{{$value.title}}</option>
+    {{/each}}
+  </script>
+
+  <!-- 文章修改列表 -->
+  <script type="text/html" id="postEdit">
+    <div class="col-md-9">
+      <div class="form-group">
+        <label for="title">标题</label>
+        <input id="title" class="form-control input-lg" type="text" placeholder="文章标题" name="title" value="{{title}}">
+      </div>
+      <div class="form-group">
+        <label for="content">内容</label>
+        <textarea id="content" class="form-control input-lg" cols="30" rows="10" placeholder="内容" name="content" value="{{content}}">{{content}}</textarea>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <label for="feature">文章封面</label>
+        show when image chose
+        {{if thumbnail}}
+        <img class="help-block thumbnail" style="display: inline-block;" id="featureImg" src="{{thumbnail}}">
+        {{/if}}
+        <input id="feature" class="form-control" type="file">
+        <input type="hidden" name="thumbnail" id="featureContent" value="{{thumbnail}}">
+      </div>
+      <div class="form-group">
+        <label for="category">所属分类</label>
+        <select id="category" class="form-control" name="category">
+          <!-- 分类选项模板 -->
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="created">发布时间</label>
+        <input id="created" class="form-control" type="datetime-local" name="createAt" value="{{createAt.substr(0,createAt.length-1)}}">
+      </div>
+      <div class="form-group">
+        <label for="status">状态</label>
+        <select id="status" class="form-control" name="state">
+          <option value="0">草稿</option>
+          <option value="1">已发布</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <button class="btn btn-primary" type="submit" id="editBtn">修改</button>
+      </div>
+    </div>
+  </script>
+  <script type="text/javascript">
+    // 将分类列表数据获取 添加到分类下拉框
+    $.ajax({
+      type:'get',
+      url:'/categories',
+      success:function(data){
+        var result = template('categoryOption',{data});
+        $('#category').html(result);
+      }
+    })
+
+    // 封面上传 
+    $('#postForm').on('change','#feature',function(){
+      var file = this.files[0];
+      console.log(this.files[0])
+      var formData = new FormData();
+      formData.append('avatar',file);
+      $.ajax({
+        type:'post',
+        url:'/upload',
+        data:formData,
+        processData: false,
+        contentType: false,
+        success:function(data){
+          $('#featureImg').prop({
+            'src':data[0].avatar,
+            'style':'display:inline-block'
+          });
+          $('#featureContent').val(data[0].avatar)
+        }
+      })
+    })
+
+    // 创建文章
+    $('#btn').on('click',function(){
+      // console.log($('#created').val())
+      // 如果没有传时间参数 该字段为null 不会触发mongodb中schema设置的default只有不传时间参数字段
+      if($('#created').val().length == 0){
+        console.log(1)
+        $('#created').prop('name','null')
+      }
+      var result = $('#postForm').serialize();
+      // console.log(result);
+      $.ajax({
+        type:'post',
+        url:'/posts',
+        data:result,
+        success:function(){
+          location.href='/admin/posts.html'
+        },
+        error:function(err){
+          // alert(JSON.parse(err.responseText).message)
+          console.log(err);
+        }
+      })
+      return false
+    })
+
+    // 根据地址中的id查询对应的文章添加到页面中
+    // console.log(location.search.split('=')[1])
+    var id = location.search.split('=')[1]
+    if(id){
+      $('#titleChange').text('修改文章')
+      $.ajax({
+        type:'get',
+        url:'/posts/'+id,
+        success:function(data){
+          // console.log(data)
+          var value = template('postEdit',data);
+          $('#postForm').html(value);
+          var categoryId = data.category._id
+          $.ajax({
+            type:'get',
+            url:'/categories',
+            success:function(data){
+              var result = template('categoryOption',{data});
+              $('#category').html(result);
+              $('option[value='+categoryId+']').prop('selected',true)
+            }
+          })
+          // console.log(value)
+        }
+      })
+    }
+
+    // 修改文章功能
+    $('#postForm').on('click','#editBtn',function(){
+      var result = $('#postForm').serialize();
+      $.ajax({
+        type:'PUT',
+        url:'/posts/'+id,
+        data:result,
+        success:function(){
+          location.href='/admin/posts.html'
+        },
+        error:function(err){
+          // alert(JSON.parse(err.responseText).message)
+          console.log(err);
+        }
+      })
+      // console.log(1)
+      return false
+    })
+  </script>
 </body>
 </html>

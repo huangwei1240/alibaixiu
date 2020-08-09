@@ -28,23 +28,19 @@
       <div class="page-action">
         <!-- show when multiple checked -->
         <a class="btn btn-danger btn-sm" href="javascript:;" style="display: none">批量删除</a>
-        <form class="form-inline">
-          <select name="" class="form-control input-sm">
-            <option value="">所有分类</option>
+        <form class="form-inline" id="selectForm">
+          <select name="category" id="categoriesBox" class="form-control input-sm">
+            <!-- 文章分类模板 -->
           </select>
-          <select name="" class="form-control input-sm">
+          <select name="state" class="form-control input-sm">
             <option value="">所有状态</option>
-            <option value="">草稿</option>
-            <option value="">已发布</option>
+            <option value="0">草稿</option>
+            <option value="1">已发布</option>
           </select>
-          <button class="btn btn-default btn-sm">筛选</button>
+          <button class="btn btn-default btn-sm" id="selectBtn">筛选</button>
         </form>
-        <ul class="pagination pagination-sm pull-right">
-          <li><a href="#">上一页</a></li>
-          <li><a href="#">1</a></li>
-          <li><a href="#">2</a></li>
-          <li><a href="#">3</a></li>
-          <li><a href="#">下一页</a></li>
+        <ul class="pagination pagination-sm pull-right" id="pageBox">
+          <!-- 文章分页模板 -->
         </ul>
       </div>
       <table class="table table-striped table-bordered table-hover">
@@ -58,40 +54,8 @@
             <th class="text-center" width="100">操作</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>随便一个名称</td>
-            <td>小小</td>
-            <td>潮科技</td>
-            <td class="text-center">2016/10/07</td>
-            <td class="text-center">已发布</td>
-            <td class="text-center">
-              <a href="javascript:;" class="btn btn-default btn-xs">编辑</a>
-              <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
-            </td>
-          </tr>
-          <tr>
-            <td>随便一个名称</td>
-            <td>小小</td>
-            <td>潮科技</td>
-            <td class="text-center">2016/10/07</td>
-            <td class="text-center">已发布</td>
-            <td class="text-center">
-              <a href="javascript:;" class="btn btn-default btn-xs">编辑</a>
-              <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
-            </td>
-          </tr>
-          <tr>
-            <td>随便一个名称</td>
-            <td>小小</td>
-            <td>潮科技</td>
-            <td class="text-center">2016/10/07</td>
-            <td class="text-center">已发布</td>
-            <td class="text-center">
-              <a href="javascript:;" class="btn btn-default btn-xs">编辑</a>
-              <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
-            </td>
-          </tr>
+        <tbody id="postBox">
+          <!-- 文章列表模板 -->
         </tbody>
       </table>
     </div>
@@ -137,5 +101,143 @@
   <script src="../assets/vendors/jquery/jquery.js"></script>
   <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
   <script>NProgress.done()</script>
+  <script src="../assets/vendors/art-template/template-web.js"></script>
+
+  <!-- 文章列表模板 -->
+  <script type="text/html" id="postList">
+    {{each records}}
+    <tr>
+      <td>{{$value.title}}</td>
+      <td>{{$value.author.nickName}}</td>
+      <td>{{$value.category.title}}</td>
+      <td class="text-center">{{$imports.formateDate($value.createAt)}}</td>
+      <td class="text-center">{{$value.state==0?'草稿':'已发布'}}</td>
+      <td class="text-center">
+        <a href="javascript:;" data-id="{{@$value._id}}" id="edit" class="btn btn-default btn-xs">编辑</a>
+        <a href="javascript:;" data-id="{{@$value._id}}" id="delete" class="btn btn-danger btn-xs">删除</a>
+      </td>
+    </tr>
+    {{/each}}
+  </script>
+
+  <!-- 文章分页模板 -->
+  <script type="text/html" id="page">
+    {{if page>1}}
+    <li><a href="javascript:;" onclick = change({{page-1}})>上一页</a></li>
+    {{/if}}
+    {{each display}}
+    <li><a href="javascript:;" onclick = change({{$value}})>{{$value}}</a></li>
+    {{/each}}
+    {{if page<pages}}
+    <li><a href="javascript:;" onclick = change({{page+1}})>下一页</a></li>
+    {{/if}}
+  </script>
+
+  <!-- 文章分类模板 -->
+  <script type="text/html" id="categoryOption">
+    <option value="">所有类型</option>
+    {{each data}}
+    <option value="{{$value._id}}">{{$value.title}}</option>
+    {{/each}}
+  </script>
+
+  <script type="text/javascript">
+    // 文章列表展示
+    $.ajax({
+      type:'get',
+      url:'/posts',
+      success:function(data){
+        
+        // 文章列表展示 
+        // console.log(data.records[0]._id)
+        var resultPost = template('postList',data);
+        $('#postBox').html(resultPost);
+        // console.log(result)
+
+        // 文章分页
+        var resultPage = template('page',data);
+        $('#pageBox').html(resultPage);
+      }
+    })
+
+    // 文章分类
+    $.ajax({
+      type:'get',
+      url:'/categories',
+      success:function(data){
+        var result = template('categoryOption',{data});
+        $('#categoriesBox').html(result);
+      }
+    })
+
+    //根据分类和状态筛选
+    $('#selectBtn').on('click',function(){
+      var result = $('#selectForm').serialize()
+        $.ajax({
+          type:'get',
+          url:'/posts',
+          data:result,
+          success:function(data){
+            console.log(data)
+            // 文章列表展示 
+            var resultPost = template('postList',data);
+            $('#postBox').html(resultPost);
+
+            // 文章分页
+            var resultPage = template('page',data);
+            $('#pageBox').html(resultPage);
+        }
+      })
+      return false
+    })
+
+    // 编辑文章
+    $('#postBox').on('click','#edit',function(){
+      var id = $(this).attr('data-id');
+      location.href = '/admin/post-add.html?id='+id;
+      // console.log(id)
+    })
+
+    // 删除文章
+    $('#postBox').on('click','#delete',function(){
+      var id = $(this).attr('data-id');
+      $.ajax({
+        type:'delete',
+        url:'/posts/'+id,
+        success:function(){
+          location.reload()
+        }
+      })
+    })
+
+    // 封装格式时间的函数
+    // console.log(formateDate('2020-08-03T16:00:00.000Z'))
+    template.defaults.imports.formateDate = formateDate;
+    function formateDate (date){
+      var dateObj = new Date(date)
+      var result = dateObj.getFullYear()+'/'+dateObj.getMonth()+'/'+dateObj.getDate()
+      return result
+    }
+
+    // 封装页码变化的ajax函数
+    function change (page){
+      $.ajax({
+        type:'get',
+        url:'/posts',
+        data:{
+          page:page
+        },
+        success:function(data){
+        // 文章列表改变
+        var resultPost = template('postList',data);
+        $('#postbox').html(resultPost);
+
+        // 文章分页改变
+        var resultPage = template('page',data);
+        $('#pageBox').html(resultPage);
+        }
+      })
+    }
+  </script>
 </body>
 </html>
