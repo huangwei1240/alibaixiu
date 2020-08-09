@@ -213,17 +213,7 @@
   </script>
   <script type="text/javascript">
     // 展示用户列表功能
-    $.ajax({
-      url:'/users',
-      type:'get',
-      success:function(data){
-        // console.log(data);
-        // 拼接端口返回的数据和模板
-        var result = template('table-tr',{data});
-        // console.log(result);
-        $('#list').html(result)
-      }
-    })
+    getUser()
     
     // 上传用户头像 具体步骤( 可通过找共同的上级元素实现头像修改功能 ) 
     // <input type="file"> onchange事件 文件上传
@@ -315,7 +305,11 @@
         type:'delete',
         url:'/users/'+id,
         success:function(data){
+<<<<<<< HEAD
           location.reload();
+=======
+          getUser();
+>>>>>>> feature
         }
       })
       // console.log(id)
@@ -366,10 +360,25 @@
         type:'delete',
         url:'/users/'+farams,
         success:function(){
-          location.reload()
+          getUser()
         }
       })
     })
+
+    // 展示用户列表功能
+    function getUser(){
+      $.ajax({
+      url:'/users',
+      type:'get',
+      success:function(data){
+        // console.log(data);
+        // 拼接端口返回的数据和模板
+        var result = template('table-tr',{data});
+        // console.log(result);
+        $('#list').html(result)
+      }
+    })
+    }
   </script>
   <script src="/assets/js/exit.js"></script>
 </body>
