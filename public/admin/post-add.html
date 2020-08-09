@@ -22,7 +22,7 @@
     </nav>
     <div class="container-fluid">
       <div class="page-title">
-        <h1>写文章</h1>
+        <h1 id="titleChange">写文章</h1>
       </div>
       <!-- 有错误信息时展示 -->
       <!-- <div class="alert alert-danger">
@@ -141,7 +141,7 @@
         <img class="help-block thumbnail" style="display: inline-block;" id="featureImg" src="{{thumbnail}}">
         {{/if}}
         <input id="feature" class="form-control" type="file">
-        <input type="hidden" name="thumbnail" id="featureContent" value="thumbnail">
+        <input type="hidden" name="thumbnail" id="featureContent" value="{{thumbnail}}">
       </div>
       <div class="form-group">
         <label for="category">所属分类</label>
@@ -161,7 +161,7 @@
         </select>
       </div>
       <div class="form-group">
-        <button class="btn btn-primary" type="submit" id="btn">保存</button>
+        <button class="btn btn-primary" type="submit" id="editBtn">修改</button>
       </div>
     </div>
   </script>
@@ -176,33 +176,8 @@
       }
     })
 
-    // console.log(location.search.split('=')[1])
-    var id = location.search.split('=')[1]
-    // 根据地址中的id查询对应的文章添加到页面中
-    if(id){
-      $.ajax({
-        type:'get',
-        url:'/posts/'+id,
-        success:function(data){
-          var value = template('postEdit',data);
-          $('#postForm').html(value);
-          var categoryId = data.category._id
-          $.ajax({
-            type:'get',
-            url:'/categories',
-            success:function(data){
-              var result = template('categoryOption',{data});
-              $('#category').html(result);
-              $('option[value='+categoryId+']').prop('selected',true)
-            }
-          })
-          // console.log(value)
-        }
-      })
-    }
-
     // 封面上传 
-    $('#feature').on('change',function(){
+    $('#postForm').on('change','#feature',function(){
       var file = this.files[0];
       console.log(this.files[0])
       var formData = new FormData();
@@ -225,13 +200,14 @@
 
     // 创建文章
     $('#btn').on('click',function(){
-      console.log($('#created').val())
+      // console.log($('#created').val())
+      // 如果没有传时间参数 该字段为null 不会触发mongodb中schema设置的default只有不传时间参数字段
       if($('#created').val().length == 0){
         console.log(1)
         $('#created').prop('name','null')
       }
       var result = $('#postForm').serialize();
-      console.log(result);
+      // console.log(result);
       $.ajax({
         type:'post',
         url:'/posts',
@@ -247,7 +223,51 @@
       return false
     })
 
+    // 根据地址中的id查询对应的文章添加到页面中
+    // console.log(location.search.split('=')[1])
+    var id = location.search.split('=')[1]
+    if(id){
+      $('#titleChange').text('修改文章')
+      $.ajax({
+        type:'get',
+        url:'/posts/'+id,
+        success:function(data){
+          // console.log(data)
+          var value = template('postEdit',data);
+          $('#postForm').html(value);
+          var categoryId = data.category._id
+          $.ajax({
+            type:'get',
+            url:'/categories',
+            success:function(data){
+              var result = template('categoryOption',{data});
+              $('#category').html(result);
+              $('option[value='+categoryId+']').prop('selected',true)
+            }
+          })
+          // console.log(value)
+        }
+      })
+    }
 
+    // 修改文章功能
+    $('#postForm').on('click','#editBtn',function(){
+      var result = $('#postForm').serialize();
+      $.ajax({
+        type:'PUT',
+        url:'/posts/'+id,
+        data:result,
+        success:function(){
+          location.href='/admin/posts.html'
+        },
+        error:function(err){
+          // alert(JSON.parse(err.responseText).message)
+          console.log(err);
+        }
+      })
+      // console.log(1)
+      return false
+    })
   </script>
 </body>
 </html>
