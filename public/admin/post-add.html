@@ -156,6 +156,11 @@
 
     // 创建文章
     $('#btn').on('click',function(){
+      console.log($('#created').val())
+      if($('#created').val().length == 0){
+        console.log(1)
+        $('#created').prop('name','null')
+      }
       var result = $('#postForm').serialize();
       console.log(result);
       $.ajax({

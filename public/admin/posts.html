@@ -58,7 +58,7 @@
             <th class="text-center" width="100">操作</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="postbox">
           <tr>
             <td>随便一个名称</td>
             <td>小小</td>
@@ -137,5 +137,44 @@
   <script src="../assets/vendors/jquery/jquery.js"></script>
   <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
   <script>NProgress.done()</script>
+  <script src="../assets/vendors/art-template/template-web.js"></script>
+
+  <!-- 文章列表模板 -->
+  <script type="text/html" id="postList">
+    {{each records}}
+    <tr>
+      <td>{{$value.title}}</td>
+      <td>{{$value.author.nickName}}</td>
+      <td>{{$value.category.title}}</td>
+      <td class="text-center">{{$imports.formateDate($value.createAt)}}</td>
+      <td class="text-center">{{$value.state==0?'草稿':'已发布'}}</td>
+      <td class="text-center">
+        <a href="javascript:;" class="btn btn-default btn-xs">编辑</a>
+        <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
+      </td>
+    </tr>
+    {{/each}}
+  </script>
+
+  <script type="text/javascript">
+    $.ajax({
+      type:'get',
+      url:'/posts',
+      success:function(data){
+        console.log(data.records[0].state)
+        template.defaults.imports.formateDate = formateDate;
+        console.log(template.defaults.imports.formateDate)
+        var result = template('postList',data);
+        $('#postbox').html(result);
+        // console.log(result)
+      }
+    })
+    // console.log(formateDate('2020-08-03T16:00:00.000Z'))
+    function formateDate (date){
+      var dateObj = new Date(date)
+      var result = dateObj.getFullYear()+'/'+dateObj.getMonth()+'/'+dateObj.getDate()
+      return result
+    }
+  </script>
 </body>
 </html>
