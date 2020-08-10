@@ -1,25 +1,31 @@
+<!-- 在最顶端使用接口获取登陆状态 -->
+<script src="/login/status"></script>
+<!-- 根据登陆状态决定是否拦截 -->
+<script src="/assets/js/LoginIntercept.js">
+  
+</script>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>Categories &laquo; Admin</title>
-  <link rel="stylesheet" href="../assets/vendors/bootstrap/css/bootstrap.css">
-  <link rel="stylesheet" href="../assets/vendors/font-awesome/css/font-awesome.css">
-  <link rel="stylesheet" href="../assets/vendors/nprogress/nprogress.css">
-  <link rel="stylesheet" href="../assets/css/admin.css">
-  <script src="../assets/vendors/nprogress/nprogress.js"></script>
+  <title>Users &laquo; Admin</title>
+  <link rel="stylesheet" href="/assets/vendors/bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" href="/assets/vendors/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="/assets/vendors/nprogress/nprogress.css">
+  <link rel="stylesheet" href="/assets/css/admin.css">
+  <script src="/assets/vendors/nprogress/nprogress.js"></script>
 </head>
 <body>
   <script>NProgress.start()</script>
 
   <div class="main">
     <nav class="navbar">
-      <button class="btn btn-default navbar-btn fa fa-bars"></button>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="password-reset.html"><i class="fa fa-user"></i>修改密码</a></li>
-        <li><a href="login.html"><i class="fa fa-sign-out"></i>退出</a></li>
-      </ul>
-    </nav>
+            <button class="btn btn-default navbar-btn fa fa-bars"></button>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="/admin/password-reset.html"><i class="fa fa-user"></i>修改密码</a></li>
+              <li><a href="javascript:;" id="exit"><i class="fa fa-sign-out"></i>退出</a></li>
+            </ul>
+          </nav>
     <div class="container-fluid">
       <div class="page-title">
         <h1>分类目录</h1>
@@ -68,21 +74,21 @@
 
   <div class="aside">
     <div class="profile">
-      <img class="avatar" src="../uploads/avatar.jpg">
-      <h3 class="name">Coder</h3>
+      <img class="avatar" src="../uploads/avatar.jpg" id="userInfoImg">
+      <h3 class="name"  id="userInfoNickName">Coder</h3>
     </div>
     <ul class="nav">
       <li>
         <a href="index.html"><i class="fa fa-dashboard"></i>仪表盘</a>
       </li>
       <li class="active">
-        <a href="#menu-posts" data-toggle="collapse">
+        <a href="#menu-posts" class="collapsed" data-toggle="collapse">
           <i class="fa fa-thumb-tack"></i>文章<i class="fa fa-angle-right"></i>
         </a>
-        <ul id="menu-posts" class="collapse in">
+        <ul id="menu-posts" class="collapse">
           <li><a href="posts.html">所有文章</a></li>
           <li><a href="post-add.html">写文章</a></li>
-          <li class="active"><a href="categories.html">分类目录</a></li>
+          <li><a href="categories.html">分类目录</a></li>
         </ul>
       </li>
       <li>
@@ -102,10 +108,14 @@
       </li>
     </ul>
   </div>
-  <script src="../assets/vendors/jquery/jquery.js"></script>
-  <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
-  <script src="../assets/vendors/art-template/template-web.js"></script>
+
+  <script src="/assets/vendors/jquery/jquery.js"></script>
+  <script src="/assets/vendors/art-template/template-web.js"></script>
+  <script src="/assets/vendors/bootstrap/js/bootstrap.js"></script>
+  <script src="/assets/js/userDisplay.js"></script>
+  <script src="/assets/js/exit.js"></script>
   <script>NProgress.done()</script>
+  
   <!-- 分类列表模板 -->
   <script type="text/html" id="categoriesView">
     {{each data}}
@@ -119,7 +129,7 @@
     </tr>
     {{/each}}
   </script>
-  
+
   <!-- 分类修改模板 -->
   <script type="text/html" id="editView">
     <h2>修改分类</h2>
@@ -136,151 +146,6 @@
     </div>
   </script>
 
-  <script type="text/javascript">
-    // 获取分类列表
-    getCategories()
-    
-    // 分类添加功能
-    $('#addBtn').on('click',function(){
-      if($('input[name="title"]').val().trim().length == 0){
-        alert('请输入分类名')
-        return false
-      }
-      if($('input[name="className"]').val().trim().length == 0){
-        alert('请输入分类图标类名')
-        return false
-      }
-
-      var result = $('#categoriesForm').serialize().trim()
-      $.ajax({
-        type:'post',
-        url:'/categories',
-        data:result,
-        success:function(data){
-          location.reload();
-        },
-        error:function(err){
-          alert(JSON.parse(err.responseText).message)
-        }
-      })
-      // console.log(result)
-      return false
-    })
-
-    // 分类修改展示
-    $('#categoriesTbody').on('click','#editBtn',function(){
-      var id = $(this).attr('data-id')
-      $.ajax({
-        type:'get',
-        url:'/categories/'+id,
-        success:function(data){
-          var result = template('editView',data);
-          $('#categoriesForm').html(result);
-        }
-      })
-    })
-
-    // 修改功能
-    $('#categoriesForm').on('click','#put',function(){
-      var id = $(this).attr('data-id')
-      var params = $('#categoriesForm').serialize()
-      // console.log(params)
-      // console.log(id)
-      $.ajax({
-        type:'put',
-        url:'/categories/'+id,
-        data:params,
-        success:function(data){
-         location.reload();
-         // console.log(data)
-        },
-        error:function(err){
-          alert(JSON.parse(err.responseText).message)
-        }
-      }) 
-      return false
-    })
-
-    // 删除功能
-    $('#categoriesTbody').on('click','#deleteBtn',function(){
-      confirm('确定要删除')
-      var id = $(this).attr('data-id')
-      $.ajax({
-        type:'delete',
-        url:'/categories/'+id,
-        success:function(){
-          location.reload();
-        },
-        error:function(){
-          alert(JSON.parse(err.responseText).message)
-        }
-      })
-    })
-
-    // 全选删除按钮
-    $('#all-checked').on('click',function(){
-      var childBtn = $('#categoriesTbody').find('input')
-      if($(this).is(':checked')){
-        childBtn.prop('checked',true);
-        $('#manyDelete').prop('style','display:inline-block')
-      }else{
-        childBtn.prop('checked',false);
-        $('#manyDelete').prop('style','display:none')
-
-      }
-      // console.log($(this).is(':checked'))
-    })
-
-    // 子元素删除按钮
-    $('#categoriesTbody').on('click','#childBtn',function(){
-      var childBtn = $('#categoriesTbody').find('input')
-      var checkedNum = childBtn.filter(':checked').length
-      if(checkedNum != 0){
-        $('#manyDelete').prop('style','display:inline-block')
-      }else{
-        $('#manyDelete').prop('style','display:none')
-      }
-      if(checkedNum  == childBtn.length){
-        $('#all-checked').prop('checked',true);
-      }else{
-        $('#all-checked').prop('checked',false);
-      }
-    })
-
-    // 批量删除功能
-    $('#manyDelete').on('click',function(){
-      var checkedEle = $('#categoriesTbody').find('input').filter(':checked');
-      var idArr = [];
-      checkedEle.each(function(index,value){
-        // console.log(value)
-        idArr[index] = $(value).attr('data-id')
-      })
-      // console.log(idArr)  
-      var params = idArr.join('-')
-      $.ajax({
-        type:'delete',
-        url:'/categories/'+params,
-        success:function(){
-          location.reload();
-        },
-        eror:function(err){
-          alert(JSON.parse(err.responseText).message);
-        }
-      }) 
-    }) 
-
-    // 分类展示功能
-    function getCategories(){
-      $.ajax({
-        type:'get',
-        url:'/categories',
-        success:function(data){
-          var result = template('categoriesView',{data});
-          $('#categoriesTbody').html(result);
-          // console.log(result)
-        }
-      })
-    }
-  </script>
+  <script src="/assets/js/categories.js"></script>
 </body>
 </html>

@@ -1,56 +1,62 @@
+<!-- 在最顶端使用接口获取登陆状态 -->
+<script src="/login/status"></script>
+<!-- 根据登陆状态决定是否拦截 -->
+<script src="/assets/js/LoginIntercept.js">
+  
+</script>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>Comments &laquo; Admin</title>
-  <link rel="stylesheet" href="../assets/vendors/bootstrap/css/bootstrap.css">
-  <link rel="stylesheet" href="../assets/vendors/font-awesome/css/font-awesome.css">
-  <link rel="stylesheet" href="../assets/vendors/nprogress/nprogress.css">
-  <link rel="stylesheet" href="../assets/css/admin.css">
-  <script src="../assets/vendors/nprogress/nprogress.js"></script>
+  <title>Users &laquo; Admin</title>
+  <link rel="stylesheet" href="/assets/vendors/bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" href="/assets/vendors/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="/assets/vendors/nprogress/nprogress.css">
+  <link rel="stylesheet" href="/assets/css/admin.css">
+  <script src="/assets/vendors/nprogress/nprogress.js"></script>
 </head>
 <body>
   <script>NProgress.start()</script>
 
   <div class="main">
-    <nav class="navbar">
-      <button class="btn btn-default navbar-btn fa fa-bars"></button>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="password-reset.html"><i class="fa fa-user"></i>修改密码</a></li>
-        <li><a href="login.html"><i class="fa fa-sign-out"></i>退出</a></li>
-      </ul>
-    </nav>
-    <div class="container-fluid">
-      <div class="page-title">
-        <h1>所有评论</h1>
-      </div>
-      <div class="page-action">
-        <ul class="pagination pagination-sm pull-right" id="pageBox">
-          <!-- 页码模板 -->
+      <nav class="navbar">
+        <button class="btn btn-default navbar-btn fa fa-bars"></button>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/admin/password-reset.html"><i class="fa fa-user"></i>修改密码</a></li>
+          <li><a href="javascript:;" id="exit"><i class="fa fa-sign-out"></i>退出</a></li>
         </ul>
+      </nav>
+      <div class="container-fluid">
+        <div class="page-title">
+          <h1>所有评论</h1>
+        </div>
+        <div class="page-action">
+          <ul class="pagination pagination-sm pull-right" id="pageBox">
+            <!-- 页码模板 -->
+          </ul>
+        </div>
+        <table class="table table-striped table-bordered table-hover">
+          <thead>
+            <tr>
+              <th>作者</th>
+              <th>评论</th>
+              <th>评论在</th>
+              <th>提交于</th>
+              <th>状态</th>
+              <th class="text-center" width="100">操作</th>
+            </tr>
+          </thead>
+          <tbody id="commentsBox">
+            
+          </tbody>
+        </table>
       </div>
-      <table class="table table-striped table-bordered table-hover">
-        <thead>
-          <tr>
-            <th>作者</th>
-            <th>评论</th>
-            <th>评论在</th>
-            <th>提交于</th>
-            <th>状态</th>
-            <th class="text-center" width="100">操作</th>
-          </tr>
-        </thead>
-        <tbody id="commentsBox">
-          
-        </tbody>
-      </table>
     </div>
-  </div>
 
   <div class="aside">
     <div class="profile">
-      <img class="avatar" src="../uploads/avatar.jpg">
-      <h3 class="name">Coder</h3>
+      <img class="avatar" src="../uploads/avatar.jpg" id="userInfoImg">
+      <h3 class="name"  id="userInfoNickName">Coder</h3>
     </div>
     <ul class="nav">
       <li>
@@ -84,12 +90,14 @@
     </ul>
   </div>
 
-  <script src="../assets/vendors/jquery/jquery.js"></script>
-  <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
-  <script src="../assets/vendors/art-template/template-web.js"></script>
-  <script src="/admin/common/formateDate-template.js"></script>
+  <script src="/assets/vendors/jquery/jquery.js"></script>
+  <script src="/assets/vendors/art-template/template-web.js"></script>
+  <script src="/assets/vendors/bootstrap/js/bootstrap.js"></script>
+  <script src="/assets/js/userDisplay.js"></script>
+  <script src="/assets/js/exit.js"></script>
+  <script src="/assets/js/formateDate-template.js"></script>
   <script>NProgress.done()</script>
-
+  
   <!-- 评论模板 -->
   <script type="text/html" id="commentTemplate">
     {{each records}}
@@ -120,99 +128,6 @@
     {{/if}}
   </script>
 
-  <script type="text/javascript">
-    /*// 添加测试评论
-    $.ajax({
-      type:'post',
-      url:'/comments',
-      data:{
-        content:'楼主好人，顶一个',
-        post:'5f304ac6e1c11736fc834d0b',
-        state:0
-      },
-      success:function(){
-        console.log(1)
-      },
-      error:function(err){
-        console.log(err)
-      }
-    })*/
-
-    // 获取评论列表
-    getComment()
-
-    // 切换评论状态
-    $('#commentsBox').on('click','#changeBtn',function(){
-      var id = $(this).attr('data-id')
-      var stateNum 
-      if($(this).text() == '批准'){
-        stateNum = 1
-      }else{
-        stateNum = 0
-      }
-      // console.log(id)
-      // console.log(stateNum)
-      $.ajax({
-        type:'put',
-        url:'/comments/'+id,
-        data:{
-          state:stateNum
-        },
-        success:function(data){
-          getComment()
-        }
-      })
-      // console.log(1)
-    })
-
-    // 删除评论功能
-    $('#commentsBox').on('click','#deleteBtn',function(){
-      confirm('确定要删除')
-      var id = $(this).attr('data-id')
-      $.ajax({
-        type:'delete',
-        url:'/comments/'+id,
-        success:function(data){
-          getComment()
-        }
-      })
-      // console.log(1)
-    })
-
-    // 封装页码变化的ajax函数
-    function change (page){
-      $.ajax({
-        type:'get',
-        url:'/comments',
-        data:{
-          page:page
-        },
-        success:function(data){
-        // 评论列表改变
-        var resultComment = template('commentTemplate',data)
-        $('#commentsBox').html(resultComment)
-        // 评论页码
-        var resultPage = template('pageTemplate',data)
-        $('#pageBox').html(resultPage)
-        }
-      })
-    }
-
-     //获取评论列表
-    function getComment(){
-      $.ajax({
-        type:'GET',
-        url:'/comments',
-        success:function(data){
-          // 评论列表获取
-          var resultComment = template('commentTemplate',data)
-          $('#commentsBox').html(resultComment)
-          // 页码
-          var resultPage = template('pageTemplate',data)
-          $('#pageBox').html(resultPage)
-        }
-      })
-    }
-  </script>
+  <script src="/assets/js/comments.js"></script>
 </body>
 </html>

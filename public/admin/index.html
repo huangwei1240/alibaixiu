@@ -1,21 +1,19 @@
 <!-- 在最顶端使用接口获取登陆状态 -->
 <script src="/login/status"></script>
 <!-- 根据登陆状态决定是否拦截 -->
-<script type="text/javascript">
-  if (isLogin == false){
-    location.href = '/admin/login.html';
-  }
+<script src="/assets/js/LoginIntercept.js">
+  
 </script>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <title>Dashboard &laquo; Admin</title>
-  <link rel="stylesheet" href="../assets/vendors/bootstrap/css/bootstrap.css">
-  <link rel="stylesheet" href="../assets/vendors/font-awesome/css/font-awesome.css">
-  <link rel="stylesheet" href="../assets/vendors/nprogress/nprogress.css">
-  <link rel="stylesheet" href="../assets/css/admin.css">
-  <script src="../assets/vendors/nprogress/nprogress.js"></script>
+  <link rel="stylesheet" href="/assets/vendors/bootstrap/css/bootstrap.css">
+  <link rel="stylesheet" href="/assets/vendors/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="/assets/vendors/nprogress/nprogress.css">
+  <link rel="stylesheet" href="/assets/css/admin.css">
+  <script src="/assets/vendors/nprogress/nprogress.js"></script>
 </head>
 <body>
   <script>NProgress.start()</script>
@@ -24,8 +22,8 @@
     <nav class="navbar">
       <button class="btn btn-default navbar-btn fa fa-bars"></button>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="password-reset.html"><i class="fa fa-user"></i>修改密码</a></li>
-        <li><a href="javascript:;"><i class="fa fa-sign-out"></i>退出</a></li>
+        <li><a href="/admin/password-reset.html"><i class="fa fa-user"></i>修改密码</a></li>
+        <li><a href="javascript:;" id="exit"><i class="fa fa-sign-out"></i>退出</a></li>
       </ul>
     </nav>
     <div class="container-fluid">
@@ -55,12 +53,12 @@
 
   <div class="aside">
     <div class="profile">
-      <img class="avatar" src="../uploads/avatar.jpg">
-      <h3 class="name">Coder</h3>
+      <img class="avatar" src="../uploads/avatar.jpg" id="userInfoImg">
+      <h3 class="name"  id="userInfoNickName">Coder</h3>
     </div>
     <ul class="nav">
       <li class="active">
-        <a href="/admin/index.html"><i class="fa fa-dashboard"></i>仪表盘</a>
+        <a href="index.html"><i class="fa fa-dashboard"></i>仪表盘</a>
       </li>
       <li>
         <a href="#menu-posts" class="collapsed" data-toggle="collapse">
@@ -73,10 +71,10 @@
         </ul>
       </li>
       <li>
-        <a href="/admin/comments.html"><i class="fa fa-comments"></i>评论</a>
+        <a href="comments.html"><i class="fa fa-comments"></i>评论</a>
       </li>
       <li>
-        <a href="/admin/users.html"><i class="fa fa-users"></i>用户</a>
+        <a href="users.html"><i class="fa fa-users"></i>用户</a>
       </li>
       <li>
         <a href="#menu-settings" class="collapsed" data-toggle="collapse">
@@ -90,58 +88,13 @@
     </ul>
   </div>
 
-  <script src="../assets/vendors/jquery/jquery.js"></script>
-  <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
-  <script src="../assets/vendors/art-template/template-web.js"></script>
+  <script src="/assets/vendors/jquery/jquery.js"></script>
+  <script src="/assets/vendors/art-template/template-web.js"></script>
+  <script src="/assets/vendors/bootstrap/js/bootstrap.js"></script>
+  <script src="/assets/js/userDisplay.js"></script>
+  <script src="/assets/js/exit.js"></script>
   <script>NProgress.done()</script>
-
-  <script type="text/javascript">
-    // 查询文章数量
-    $.ajax({
-      type:'get',
-      url:'/posts/count',
-      success:function(data){
-        $('#countPosts').find('strong')[0].innerHTML = data.postCount
-        $('#countPosts').find('strong')[1].innerHTML = data.draftCount
-        // console.log(data.postCount)
-        // console.log($('#countPost').find('strong')[0])
-      }
-    })
-
-    // 查询分类数量
-    $.ajax({
-      type:'get',
-      url:'/categories/count',
-      success:function(data){
-        $('#countCategories').find('strong')[0].innerHTML = data.categoryCount
-        // console.log(data.postCount)
-        // console.log($('#countPost').find('strong')[0])
-      }
-    })
-
-    // 查询评论数量
-    $.ajax({
-      type:'get',
-      url:'/comments/count',
-      success:function(data){
-        $('#countComments').find('strong')[0].innerHTML = data.commentCount
-        // console.log(data)
-      }
-    })
-
-    // 查询评论列表筛选未审核的
-    $.ajax({
-      type:'get',
-      url:'/comments',
-      success:function(data){
-        var result = data.records.filter(function(value){
-          return value.state == 0
-        })
-        // console.log(result.length)
-        $('#countComments').find('strong')[1].innerHTML = result.length
-        // console.log(data)
-      }
-    })
-  </script>
+  
+  <script src="/assets/js/index.js"></script>
 </body>
 </html>
