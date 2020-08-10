@@ -120,13 +120,16 @@
       <td>{{$value.title}}</td>
       <td>{{$value.link}}</td>
       <td class="text-center">
-        <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
+        <a href="javascript:;" class="btn btn-danger btn-xs" data-id={{@$value._id}} id="deleteBtn">删除</a>
       </td>
     </tr>
     {{/each}}
   </script>
 
   <script type="text/javascript">
+    // 轮播图数据展示
+    getImgList()
+
     // 上传轮播图文件
     $('input[type="file"]').on('change',function(){
       var formData = new FormData();
@@ -164,15 +167,31 @@
       return false
     })
 
-    // 轮播图数据展示
-    $.ajax({
-      type:'get',
-      url:'/slides',
-      success:function(data){
-        var result = template('imagetemplate',{data})
-        $('#imageBox').html(result);
-      }
+    // 删除
+    $('#imageBox').on('click','#deleteBtn',function(){
+      confirm('确定删除')
+      var id = $(this).attr('data-id')
+      $.ajax({
+        type:'delete',
+        url:'/slides/'+id,
+        success:function(){
+          getImgList()
+        }
+      })
     })
+    
+    // 封装轮播图数据展示函数
+    function getImgList(){
+      $.ajax({
+        type:'get',
+        url:'/slides',
+        success:function(data){
+          var result = template('imagetemplate',{data})
+          $('#imageBox').html(result);
+        }
+      })
+    }
+    
   </script>
   <script>NProgress.done()</script>
 </body>
