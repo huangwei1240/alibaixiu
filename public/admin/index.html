@@ -40,10 +40,10 @@
             <div class="panel-heading">
               <h3 class="panel-title">站点内容统计：</h3>
             </div>
-            <ul class="list-group">
-              <li class="list-group-item"><strong>10</strong>篇文章（<strong>2</strong>篇草稿）</li>
-              <li class="list-group-item"><strong>6</strong>个分类</li>
-              <li class="list-group-item"><strong>5</strong>条评论（<strong>1</strong>条待审核）</li>
+            <ul class="list-group" id="countBox">
+              <li class="list-group-item" id="countPosts"><strong>10</strong>篇文章（<strong>2</strong>篇草稿）</li>
+              <li class="list-group-item" id="countCategories"><strong>6</strong>个分类</li>
+              <li class="list-group-item" id="countComments"><strong>5</strong>条评论（<strong>1</strong>条待审核）</li>
             </ul>
           </div>
         </div>
@@ -92,6 +92,56 @@
 
   <script src="../assets/vendors/jquery/jquery.js"></script>
   <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
+  <script src="../assets/vendors/art-template/template-web.js"></script>
   <script>NProgress.done()</script>
+
+  <script type="text/javascript">
+    // 查询文章数量
+    $.ajax({
+      type:'get',
+      url:'/posts/count',
+      success:function(data){
+        $('#countPosts').find('strong')[0].innerHTML = data.postCount
+        $('#countPosts').find('strong')[1].innerHTML = data.draftCount
+        // console.log(data.postCount)
+        // console.log($('#countPost').find('strong')[0])
+      }
+    })
+
+    // 查询分类数量
+    $.ajax({
+      type:'get',
+      url:'/categories/count',
+      success:function(data){
+        $('#countCategories').find('strong')[0].innerHTML = data.categoryCount
+        // console.log(data.postCount)
+        // console.log($('#countPost').find('strong')[0])
+      }
+    })
+
+    // 查询评论数量
+    $.ajax({
+      type:'get',
+      url:'/comments/count',
+      success:function(data){
+        $('#countComments').find('strong')[0].innerHTML = data.commentCount
+        // console.log(data)
+      }
+    })
+
+    // 查询评论列表筛选未审核的
+    $.ajax({
+      type:'get',
+      url:'/comments',
+      success:function(data){
+        var result = data.records.filter(function(value){
+          return value.state == 0
+        })
+        // console.log(result.length)
+        $('#countComments').find('strong')[1].innerHTML = result.length
+        // console.log(data)
+      }
+    })
+  </script>
 </body>
 </html>

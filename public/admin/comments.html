@@ -167,6 +167,7 @@
 
     // 删除评论功能
     $('#commentsBox').on('click','#deleteBtn',function(){
+      confirm('确定要删除')
       var id = $(this).attr('data-id')
       $.ajax({
         type:'delete',

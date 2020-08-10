@@ -203,6 +203,7 @@
 
     // 删除功能
     $('#categoriesTbody').on('click','#deleteBtn',function(){
+      confirm('确定要删除')
       var id = $(this).attr('data-id')
       $.ajax({
         type:'delete',

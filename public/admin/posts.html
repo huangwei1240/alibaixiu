@@ -186,6 +186,7 @@
 
     // 删除文章
     $('#postBox').on('click','#delete',function(){
+      confirm('确定要删除')
       var id = $(this).attr('data-id');
       $.ajax({
         type:'delete',
