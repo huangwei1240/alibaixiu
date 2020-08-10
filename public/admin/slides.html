@@ -30,24 +30,25 @@
       </div> -->
       <div class="row">
         <div class="col-md-4">
-          <form>
+          <form id="imgForm">
             <h2>添加新轮播内容</h2>
             <div class="form-group">
               <label for="image">图片</label>
               <!-- show when image chose -->
-              <img class="help-block thumbnail" style="display: none">
+              <img class="help-block thumbnail" style="display: none" id="preview">
               <input class="form-control" type="file">
+              <input type="hidden" name="image">
             </div>
             <div class="form-group">
               <label for="text">文本</label>
-              <input id="text" class="form-control" type="text" placeholder="文本">
+              <input id="text" class="form-control" type="text" placeholder="文本" name="title">
             </div>
             <div class="form-group">
               <label for="link">链接</label>
-              <input id="link" class="form-control" type="text" placeholder="链接">
+              <input id="link" class="form-control" type="text" placeholder="链接" name="link">
             </div>
             <div class="form-group">
-              <button class="btn btn-primary" type="submit">添加</button>
+              <button class="btn btn-primary" type="submit" id="addBtn">添加</button>
             </div>
           </form>
         </div>
@@ -61,23 +62,8 @@
                 <th class="text-center" width="100">操作</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td class="text-center"><img class="slide" src="../uploads/slide_1.jpg"></td>
-                <td>XIU功能演示</td>
-                <td>#</td>
-                <td class="text-center">
-                  <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-center"><img class="slide" src="../uploads/slide_2.jpg"></td>
-                <td>XIU功能演示</td>
-                <td>#</td>
-                <td class="text-center">
-                  <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
-                </td>
-              </tr>
+            <tbody id="imageBox">
+              
             </tbody>
           </table>
         </div>
@@ -122,9 +108,72 @@
     </ul>
   </div>
 
-  <script src="../assets/vendors/jquery/jquery.js"></script>
-  <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
-  <script src="../assets/js/slides.js"></script>
+  <script src="/assets/vendors/jquery/jquery.js"></script>
+  <script src="/assets/vendors/bootstrap/js/bootstrap.js"></script>
+  <script src="../assets/vendors/art-template/template-web.js"></script>
+
+  <!-- 轮播图信息展示模板 -->
+  <script type="text/html" id="imagetemplate">
+    {{each data}}
+    <tr>
+      <td class="text-center"><img class="slide" src={{$value.image}}></td>
+      <td>{{$value.title}}</td>
+      <td>{{$value.link}}</td>
+      <td class="text-center">
+        <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
+      </td>
+    </tr>
+    {{/each}}
+  </script>
+
+  <script type="text/javascript">
+    // 上传轮播图文件
+    $('input[type="file"]').on('change',function(){
+      var formData = new FormData();
+      formData.append('avatar',this.files[0])
+      console.log(this.files[0])
+      $.ajax({
+        type:'post',
+        url:'/upload',
+        data:formData,
+        processData:false,
+        contentType:false,
+        success:function(data){
+          $('#preview').prop('style','display:inline-block')
+          $('#preview').prop('src',data[0].avatar)
+          $('input[type="hidden"]').val(data[0].avatar)
+        }
+      })
+    })
+
+    // 上传轮播图数据
+    $('#addBtn').on('click',function(){
+      var result = $('#imgForm').serialize()
+      $.ajax({
+        type:'post',
+        url:'/slides',
+        data:result,
+        success:function(){
+          location.reload()
+        },
+        error:function(err){
+          console.log(err)
+        }
+      })
+      // console.log(result)
+      return false
+    })
+
+    // 轮播图数据展示
+    $.ajax({
+      type:'get',
+      url:'/slides',
+      success:function(data){
+        var result = template('imagetemplate',{data})
+        $('#imageBox').html(result);
+      }
+    })
+  </script>
   <script>NProgress.done()</script>
 </body>
 </html>
