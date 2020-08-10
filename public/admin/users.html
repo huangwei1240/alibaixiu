@@ -1,3 +1,11 @@
+<!-- 在最顶端使用接口获取登陆状态 -->
+<script src="/login/status"></script>
+<!-- 根据登陆状态决定是否拦截 -->
+<script type="text/javascript">
+  if (isLogin == false){
+    location.href = '/admin/login.html';
+  }
+</script>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -103,8 +111,8 @@
 
   <div class="aside">
     <div class="profile">
-      <img class="avatar" src="../uploads/avatar.jpg">
-      <h3 class="name">Coder</h3>
+      <img class="avatar" src="../uploads/avatar.jpg" id="userInfoImg">
+      <h3 class="name"  id="userInfoNickName">Coder</h3>
     </div>
     <ul class="nav">
       <li>
@@ -152,7 +160,7 @@
       <td>{{$value.email}}</td>
       <td>{{$value.nickName}}</td>
       <td>{{$value.status==0?'未激活':'激活'}}</td>
-      <td>{{$value.role==normal?'普通用户':'管理员'}}</td>
+      <td>{{$value.role=='normal'?'普通用户':'管理员'}}</td>
       <td class="text-center">
         <a href="javascript:;" class="btn btn-default btn-xs" id="edit" data-id="{{@$value._id}}">编辑</a>
         <a href="javascript:;" class="btn btn-danger btn-xs" id="delete" data-id="{{@$value._id}}">删除</a>
@@ -169,10 +177,10 @@
       <div class="form-group">
         <label class="form-image">
           <input id="avatar" type="file">
-          {{if avatar!=null}}
+          {{if avatar}}
           <input type="hidden" id="avatarAdd" name="avatar" value="{{avatar}}">
           <img src="{{avatar}}" id="avatarImg">
-          {{else if avatar==null}}
+          {{else if !avatar}}
           <input type="hidden" id="avatarAdd" name="avatar">
           <img src="../assets/img/default.png" id="avatarImg">
           {{/if}}
@@ -241,7 +249,7 @@
     $('#addBtn').on('click',function(){
       // 获取表单信息
       var result = $('#userForm').serialize();
-      // console.log(result);
+      console.log(result);
       $.ajax({
         url:'/users',
         type:'post',
@@ -359,6 +367,11 @@
         url:'/users/'+farams,
         success:function(){
           getUser()
+        },
+        error:function(err){
+          // console.log(err)
+          // JSON.parse(err.responseText);
+          alert(JSON.parse(err.responseText).message)
         }
       })
     })
@@ -374,9 +387,21 @@
         var result = template('table-tr',{data});
         // console.log(result);
         $('#list').html(result)
+        }
+      })
+    }
+
+    // 登录用户显示
+    $.ajax({
+      type:'get',
+      url:'/users/'+userId,
+      success:function(data){
+        if(data.avatar){
+          $('#userInfoImg').prop('src',data.avatar)
+        }
+        $('#userInfoNickName').text(data.nickName)
       }
     })
-    }
   </script>
   <script src="/assets/js/exit.js"></script>
 </body>
