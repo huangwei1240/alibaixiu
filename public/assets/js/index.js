@@ -1,3 +1,7 @@
+// 获取最新推荐
+getPost('/posts/lasted','')
+
+// 轮播图
 $.ajax({
 	type:'get',
 	url:'/slides',
@@ -27,13 +31,18 @@ $.ajax({
 	}
 })
 
-// 最新推荐
-$.ajax({
-	type:'get',
-	url:'/posts/lasted',
-	success:function(data){
-		var html = template('lasted-t',{data})
-		console.log(data)
-		$('#panelNewBox').html(html)
-	}
+// 点赞
+$('#postBox').on('click','a[data-id]',function(){
+	var id = $(this).attr('data-id')
+	$.ajax({
+		type:'post',
+		url:'/posts/fabulous/'+id,
+		success:function(data){
+			getPost('/posts/lasted')
+		}
+	})
+	// console.log(1)
 })
+
+
+

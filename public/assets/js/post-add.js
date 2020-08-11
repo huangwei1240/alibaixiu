@@ -58,7 +58,7 @@ $('#btn').on('click',function(){
 
 // 根据地址中的id查询对应的文章添加到页面中
 // console.log(location.search.split('=')[1])
-var id = location.search.split('=')[1]
+var id = getUrlParams()
 if(id){
   $('#titleChange').text('修改文章')
   $.ajax({
