@@ -62,9 +62,13 @@ function change (page){
       page:page
     },
     success:function(data){
+      console.log(data)
     // 文章列表改变
     var resultPost = template('postList',data);
-    $('#postbox').html(resultPost);
+      console.log(resultPost)
+    $('#postBox').html(resultPost);
+      console.log($('#postBox').html())
+
 
     // 文章分页改变
     var resultPage = template('page',data);
