@@ -23,7 +23,7 @@ $.ajax({
 	success:function(data){
 		var randomT=
 		`{{each data}}<li>
-            <a href=""/detail.html?id={{@$value._id}}">
+            <a href="/detail.html?id={{@$value._id}}">
               <p class="title">{{$value.title}}</p>
               <p class="reading">阅读(819)</p>
               <div class="pic">
